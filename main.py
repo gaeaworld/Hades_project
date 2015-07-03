@@ -1,0 +1,605 @@
+#!/usr/bin/python
+# coding=UTF-8
+#http://tech.marsw.tw/blog/2014/09/03/getting-started-with-python-in-ten-minute
+#https://www.youtube.com/watch?v=MSOlZeDN3qc
+#
+#modify date:20150701,23:27
+#
+#install grs and example and step:
+#sudo apt-get install python-dev
+#sudp apt-get install python-pip
+#sudo pip install grs
+#python
+#>>> from grs import Stock
+#>>> Stock('2618').info
+#
+#version:0.03
+#
+#20150617 - version 0.01
+#         (1) list bone of program
+#
+#20150619 - version 0.01
+#         (1) search value in file sub function
+#
+#20150620 - version 0.01
+#         (1) gen target file to save target value
+#         (2) finish date and yesterday and the day before yesterday calculate
+#         (3) timer function
+#         (4) send mail function
+#20150621 - version 0.01
+#         (1) algorithm of buy and keep
+#20150622 - version 0.02
+#         (1) define main_process function
+#         (2) timer can ruting to call main_process function
+#         (3) create share folder for record share of stock
+#         (4) base algonism to auto sale out and buy in stock
+#         (5) record trade price file
+#20150624 - versioin 0.02
+#         (1) run many stock in one time
+#         (2) Debug flag
+#         (3) rm "target_sdate1_val.txt"
+#         (4) different stock save diff csv file
+#20150701 - version 0.03
+#         (1) use "cron" table to count day,"cron" to loop main.py, only run main.py at mon to fri
+#              x1. sudo su, no need do this step
+#              2. crontab -e
+#              3. 40 13 * * 1-5 /home/pi/Hades_project/main.py > /home/pi/Hades_project/syslog.txt
+#              4. /etc/init.d/cron restart
+#         (2) apach2 server as fw update interface
+#              1. input 192.168.1.116 into browser
+#              2. chose the main.py 
+#              3. the script "fw_Hades_update.sh" will take care of replace main.py file 
+#         (3) merge mail "keep or sale" & "trade price" into one mail
+#
+
+#
+#Next action:
+#         (3) read a external file.txt which your stock list as "STOCK=" input
+#         (6) manual input share of stock and write into record share file
+#         ok - (8) record CPU temp into mail and file(CPU_temp.txt)
+#         (9) csv file depand on different folder to save
+#         (10) two Stock should send one mail...
+#
+
+#
+#Next action:
+#         ok - line 412 (1) merge mail "keep or sale" & "trade price" into one mail
+#         (3) read a external file.txt which your stock list as "STOCK=" input
+#         (6) manual input share of stock and write into record share file
+#         (7) saturday and sunday don't need work. filter sat and sunday.
+#         ok - (8) record CPU temp into mail and file(CPU_temp.txt)
+#         (9) csv file depand on different folder to save
+#         (10) two Stock should send one mail...
+#
+
+#//-----------------------------
+#//          lib
+#//-----------------------------
+import sys
+import csv
+import datetime
+from time import gmtime, strftime, strptime
+import smtplib
+import time
+#// 2. catch a stock value, like get 3231 value
+from grs import Stock
+import os
+
+#//-----------------------------
+#//          Debug
+#//-----------------------------
+TURN_ON = 1
+TURN_OFF = 0
+DEBUG = TURN_OFF
+DEBUG_MAIL = TURN_ON
+
+#//-----------------------------
+#//          function
+#// http://www.qttc.net/201209207.html
+#//-----------------------------
+#// create folder
+def mkdir(path):
+
+    path = path.strip()
+    path = path.rstrip("/")
+
+    isExists = os.path.exists(path)
+
+    if not isExists:
+        print path+' create ok!!'
+        os.makedirs(path)
+        return True
+    else:
+        #print path+' folder already exist!!'
+        return False
+
+#// search value in file
+def search_s_e_h_l_fun(w_val, file_name):
+    file_in_target = file(file_name, 'r')
+    for row in csv.DictReader(file_in_target, ["data", "total_val", "unknow1", "start_val", "highest_val", "lowest_val", "end_val", "range_val", "unknow2"]):
+        get_value = row[w_val]
+        #print (w_val+':  '+ get_value)
+    file_in_target.close()
+    return get_value
+
+#//---------------------------------
+#// test day avaliable
+#// find the specific date data
+#// ok = 0, not ok = 1
+#//---------------------------------
+def test_day_avaliable(target_date, source_file):
+    res_tmp = 0
+    file_in = file(source_file, 'r')
+    for line in file_in:
+        str = line
+        res = str.find(target_date)
+        if(res > 0):
+            res_tmp = 1
+    if(res_tmp == 1):
+        value = 0
+    else:
+        #print (target_date + " is holiday... stock market not open")
+        value = 1
+    file_in.close()
+    return value
+
+#//---------------------------------
+#// gen target file
+#// find the specific date data
+#//---------------------------------
+def gen_target_file(target_date, source_file, target_file):
+    res_tmp = 0
+    file_in = file(source_file, 'r')
+    file_in_target = file(target_file, 'w')
+    for line in file_in:
+        str = line
+        res = str.find(target_date)
+        if(res > 0):
+            res_tmp = 1
+            #print line
+            file_in_target.write(line)
+    if(res_tmp == 1):
+        #print line
+        value = 0
+    else:
+        #print (target_date + " is holiday... stock market not open")
+        value = 1
+    file_in.close()
+    file_in_target.close()
+    return value
+
+#//---------------------------------
+#// send mail function
+#// http://www.pythonforbeginners.com/code-snippets-source-code/using-python-to-send-email
+#//---------------------------------
+def sendemail(from_addr, to_addr_list, cc_addr_list,
+              subject, message,
+              login, password,
+              smtpserver='smtp.gmail.com:587'):
+    header  = 'From: %s\n' % from_addr
+    header += 'To: %s\n' % ','.join(to_addr_list)
+    header += 'Cc: %s\n' % ','.join(cc_addr_list)
+    header += 'Subject: %s\n\n' % subject
+    message = header + message
+
+    server = smtplib.SMTP(smtpserver)
+    server.starttls()
+    server.login(login,password)
+    problems = server.sendmail(from_addr, to_addr_list, message)
+    server.quit()
+
+def init_record_trade_price_file(stock_number):
+
+    #// 8.1 create trade folder and create trade file
+    folder_name="/home/pi/Hades_project/trade_record"
+    mkdir(folder_name)
+    file_name = '/home/pi/Hades_project/trade_record/' + stock_number + '_tr_price.txt'
+
+    isExists = os.path.exists(file_name)
+
+    if not isExists:
+        tr_file = open(file_name, 'w')
+        tr_file.write("date              buy_price              sale_price\n")
+        tr_file.close()
+        return True
+    else:
+        #print path+' folder already exist!!'
+        return False
+
+#//---------------------------------
+#// send mail function
+#// 8. record file for record buy or sale price
+# date        buy_price        sale_price
+#2015/06/18   22.5
+#2015/06/19                    30.5
+#//---------------------------------
+def record_trade_price(stock_number, price, motion):
+    #// 8.2 write "date", "buy_price", "sale_price" into trade file
+    file_name = '/home/pi/Hades_project/trade_record/' + stock_number + '_tr_price.txt'
+    tr_file = open(file_name, 'a')
+    today_date = datetime.date.today()
+    today_date = str(today_date)
+    if(motion == 'buy'):
+        price_msg = today_date + '        ' + price + '\n'
+    elif (motion == 'sale'):
+        price_msg = today_date + '                               ' + price + '\n'
+    tr_file.write(price_msg)
+    tr_file.close()
+
+#//---------------------------------
+#// clean garbage file
+#//---------------------------------
+def clean_garbage_file(file_name):
+    file = 'rm ' + file_name
+    os.system(file)
+
+#//---------------------------------
+#// write CPU data into file
+#//---------------------------------
+def write_cpu_temp_file(cpu_temp):
+    CPU_TEMP = cpu_temp
+
+    #//save cpu temp into file
+    file_name = '/home/pi/Hades_project/CPU_temperature.txt'
+    isExists = os.path.exists(file_name)
+
+    if not isExists:
+        tr_file = open(file_name, 'w')
+        print 'open new file\n'
+    else:
+        tr_file = open(file_name, 'a')
+        print 'open old file\n'
+
+    today_date = datetime.date.today()
+    today_date = str(today_date)
+    cpu_msg = today_date + '  CPU:' + CPU_TEMP + '\n'
+    tr_file.write(cpu_msg)
+    tr_file.close()
+    print 'done!\n'
+
+#//---------------------------------
+#// get CPU temperture
+#//---------------------------------
+def get_cpu_temp():
+    #//run get cpu cmd
+    os.system("vcgencmd measure_temp > /home/pi/Hades_project/CPU_temperature.txt")
+    file_name = '/home/pi/Hades_project/CPU_temperature.txt'
+    fd = open(file_name, 'r')
+    CPU_TEMP = fd.read()
+    fd.close()
+    CPU_TEMP = str(CPU_TEMP)
+    print "now CPU " + CPU_TEMP
+    return CPU_TEMP
+
+#//---------------------------------
+#// detect file exist or not
+#//---------------------------------
+def detect_file(file_name):
+    isExists = os.path.exists(file_name)
+
+    if not isExists:
+        return 1
+    else:
+        return 0
+
+
+#//---------------------------------
+#// main_process
+#//---------------------------------
+def main_process(stock_number):
+    global PIECE
+    global sim_day
+    global cdate1
+    global cdate2
+    global cdate3
+    global sdate1
+    global sdate2
+    global sdate3
+    cdate1 = datetime.date.today()
+    cdate2 = datetime.date.today()
+    cdate3 = datetime.date.today()
+    sdate1 = '0'
+    sdate2 = '0'
+    sdate3 = '0'
+
+    stock_wis = Stock(stock_number)
+    #// 3. create folder for save csv data
+    mkpath="/home/pi/Hades_project/csv_repository"
+    mkdir(mkpath)
+    get_date = datetime.date.today()
+    get_sdate = str(get_date)
+    csv_file = "/home/pi/Hades_project/csv_repository/" + stock_number + '_' + get_sdate + '.csv'
+    stock_wis.out_putfile(csv_file)
+    #// 3.1 create share of stock folder
+    mkpath="/home/pi/Hades_project/share_stock"
+    mkdir(mkpath)
+    #// 3.2 recore share of stock file
+    filepath = '/home/pi/Hades_project/share_stock/' + stock_number + '.txt'
+    isExists = os.path.exists(filepath)
+
+    if not isExists:
+        fd = open(filepath, 'w')
+        piece_num = '0'
+        fd.write(piece_num)
+        fd.close
+        PIECE = 0
+        print filepath+' create ok!!'
+    else:
+        #print filepath+' folder already exist!!'
+        fd = open(filepath, 'r')
+        PIECE = fd.read()
+        fd.close
+        PIECE = PIECE.rstrip('\n')
+
+    #// 4. filter highest, lower, end, start of value and show thos value
+    # http://swaywang.blogspot.tw/2012/05/pythoncsv.html
+    # http://www.lfhacks.com/tech/python-read-specific-column-csv
+    #//---------------------------------
+    #// get time function
+    #//---------------------------------
+    #sdate1 = strftime("%D")
+    #ssdate1 = sdate1[0:5]
+    #cdate1 = datetime.date.today() + (datetime.timedelta(days=sim_day))
+    #cdate1 = datetime.date.today() + (datetime.timedelta(days=-4))
+    #cdate2 = cdate1 + (datetime.timedelta(days=-1))
+    #cdate3 = cdate1 + (datetime.timedelta(days=-2))
+
+    #//current date,6/20
+    check_done = 0
+    delta_day = 0
+    while(check_done == 0):
+        cdate1 = datetime.date.today() + (datetime.timedelta(days=delta_day))
+        sdate1 = str(cdate1)
+        sdate1 = sdate1[5:10]
+        sdate1 = sdate1.replace('-','/')
+        res = test_day_avaliable(sdate1, csv_file)
+        if(res == 0):
+            #print sdate1
+            #print "find a right day1!"
+            check_done = 1
+            #print "---------------"
+        else:
+            #print "can't find match day1!"
+            delta_day = (delta_day - 1)
+
+    #//yesterday,6/19
+    check_done = 0
+    delta_day = -1
+    while(check_done == 0):
+        cdate2 = cdate1 + (datetime.timedelta(days=delta_day))
+        sdate2 = str(cdate2)
+        sdate2 = sdate2[5:10]
+        sdate2 = sdate2.replace('-','/')
+        res = test_day_avaliable(sdate2, csv_file)
+        if(res == 0):
+            #print sdate2
+            #print "find a right day2!"
+            check_done = 1
+            #print "---------------"
+        else:
+                    #print "can't find match day2!"
+            delta_day = (delta_day - 1)
+
+
+    #//the day before yesterday,6/18
+    check_done = 0
+    delta_day = -1
+    while(check_done == 0):
+        cdate3 = cdate2 + (datetime.timedelta(days=delta_day))
+        sdate3 = str(cdate3)
+        sdate3 = sdate3[5:10]
+        sdate3 = sdate3.replace('-','/')
+        res = test_day_avaliable(sdate3, csv_file)
+        if(res == 0):
+            #print sdate3
+            #print "find a right day3!"
+            check_done = 1
+            #print "---------------"
+        else:
+            #print "can't find match day3!"
+            delta_day = (delta_day - 1)
+
+    #//---------------------------------
+    #//find the specific date data
+    #//---------------------------------
+    #print sdate1
+    res1 = gen_target_file(sdate1, csv_file, '/home/pi/Hades_project/csv_repository/target_sdate1_val.txt')
+    if(res1 == 0):
+    #//day1,current date
+    #//     4.1 hishest value
+        day1_h = search_s_e_h_l_fun('highest_val', '/home/pi/Hades_project/csv_repository/target_sdate1_val.txt')
+    #//     4.2 lower value
+        day1_l = search_s_e_h_l_fun('lowest_val', '/home/pi/Hades_project/csv_repository/target_sdate1_val.txt')
+    #//     4.3 end value
+        day1_e = search_s_e_h_l_fun('end_val', '/home/pi/Hades_project/csv_repository/target_sdate1_val.txt')
+    #//     4.4 start value
+        day1_s = search_s_e_h_l_fun('start_val', '/home/pi/Hades_project/csv_repository/target_sdate1_val.txt')
+        #print 'h:'+day1_h
+        #print 'l:'+day1_l
+        #print 'e:'+day1_e
+        #print 's:'+day1_s
+        clean_garbage_file('/home/pi/Hades_project/csv_repository/target_sdate1_val.txt')
+    else:
+        print "Error :day1 not avaible~"
+        return 1
+    #print "---------------"
+
+    #print sdate2
+    res2 = gen_target_file(sdate2, csv_file, '/home/pi/Hades_project/csv_repository/target_sdate2_val.txt')
+    #//day2,yesterday
+    if(res2 == 0):
+        day2_h = search_s_e_h_l_fun('highest_val', '/home/pi/Hades_project/csv_repository/target_sdate2_val.txt')
+        day2_l = search_s_e_h_l_fun('lowest_val', '/home/pi/Hades_project/csv_repository/target_sdate2_val.txt')
+        day2_e = search_s_e_h_l_fun('end_val', '/home/pi/Hades_project/csv_repository/target_sdate2_val.txt')
+        day2_s = search_s_e_h_l_fun('start_val', '/home/pi/Hades_project/csv_repository/target_sdate2_val.txt')
+        #print 'h:'+day2_h
+        #print 'l:'+day2_l
+        #print 'e:'+day2_e
+        #print 's:'+day2_s
+        clean_garbage_file('/home/pi/Hades_project/csv_repository/target_sdate2_val.txt')
+    else:
+        print "Error :day2 not avaible~"
+        return 1
+    #print "---------------"
+
+    #print sdate3
+    res3 = gen_target_file(sdate3, csv_file, '/home/pi/Hades_project/csv_repository/target_sdate3_val.txt')
+    #//day3,the day before yesterday
+    if(res3 == 0):
+        day3_h = search_s_e_h_l_fun('highest_val', '/home/pi/Hades_project/csv_repository/target_sdate3_val.txt')
+        day3_l = search_s_e_h_l_fun('lowest_val', '/home/pi/Hades_project/csv_repository/target_sdate3_val.txt')
+        day3_e = search_s_e_h_l_fun('end_val', '/home/pi/Hades_project/csv_repository/target_sdate3_val.txt')
+        day3_s = search_s_e_h_l_fun('start_val', '/home/pi/Hades_project/csv_repository/target_sdate3_val.txt')
+        #print 'h:'+day3_h
+        #print 'l:'+day3_l
+        #print 'e:'+day3_e
+        #print 's:'+day3_s
+        clean_garbage_file('/home/pi/Hades_project/csv_repository/target_sdate3_val.txt')
+    else:
+        print "Error :day3 not avaible~"
+        return 1
+    #print "---------------"
+    #// 5. algorithm to compare value bigger or lower
+    #// 5.1 three day detection algorithm, buy in
+    #//     buy_flag = 0 -> not buy, 1 -> buy
+    print "+++++ BUY Session ++++"
+    if(day1_h > day3_h):
+        print (sdate1+" is high than "+sdate3+", BUY!")
+        buy_flag = 1
+        if(PIECE == '0'):
+            print "buy in share of 1000"
+            PIECE = 1000
+            fd = open(filepath, 'w')
+            piece_num = '1000'
+            fd.write(piece_num)
+            fd.close
+            record_trade_price(stock_number, day1_h, 'buy')
+        else:
+            print "do nothing"
+    else:
+        print (sdate1+" is high than "+sdate3+", DO NOT BUY!")
+        buy_flag = 0
+
+    #// 5.2 three day detection algorithm, sale out
+    #//    keep_flag = 0 ->sale out, 1 -> keep
+    print "+++++ SALE Session ++++"
+    if(day1_e < day3_e):
+        print (sdate1+" is lower than "+sdate3+", SALE OUT!")
+        keep_flag = 0
+        if(PIECE == '1000'):
+            print "sale out share of 1000"
+            PIECE = 0
+            fd = open(filepath, 'w')
+            piece_num = '0'
+            fd.write(piece_num)
+            fd.close
+            record_trade_price(stock_number, day1_e, 'sale')
+        else:
+            print "you don't have any share of stock"
+    else:
+        print sdate1+" is higher or equal than "+sdate3+", KEEP!"
+        keep_flag = 1
+
+    #// 9. CPU record
+    cpu_tempertrue_value = get_cpu_temp()
+    #cpu_tempertrue_value = str(40)
+    write_cpu_temp_file(cpu_tempertrue_value)
+    cpu_tempertrue_value = "now CPU " + str(cpu_tempertrue_value)
+
+    today_date = datetime.date.today()
+    today_date = str(today_date)
+    if(keep_flag == 0):
+        result_massage = today_date + " machine say:" + stock_number + " SALE OUT!!\n" + cpu_tempertrue_value
+    else:
+        result_massage = today_date + " machine say:" + stock_number + " KEEP!! " + cpu_tempertrue_value
+
+    #// 6. send mail to notice user
+    #// issue: cc wouldn't work!
+    #// to_addr_list = ['tef2323@gmail.com','williamultra@gmail.com']
+    #if(DEBUG == TURN_OFF):
+    if(DEBUG_MAIL == TURN_ON):
+        #sendemail(from_addr    = 'python@RC.net',
+        #          to_addr_list = ['tef2323@gmail.com'],
+        #          cc_addr_list = [''],
+        #          subject      = 'Make money machine letter',
+        #          message      = result_massage,
+        #          login        = 'tef2323@gmail.com',
+        #          password     = '1QAZ@wsx')
+        deal_result_massage = result_massage
+        #//read trade record file
+        file_name = '/home/pi/Hades_project/trade_record/' + stock_number + '_tr_price.txt'
+        tr_file = open(file_name, 'r')
+        trade_result_massage = tr_file.read()
+        result_massage = deal_result_massage + '\n' +  trade_result_massage
+        tr_file.close()
+        sendemail(from_addr    = 'python@RC.net',
+                  to_addr_list = ['tef2323@gmail.com'],
+                  cc_addr_list = [''],
+                  subject      = 'Make money machine letter',
+                  message      = result_massage,
+                  login        = 'tef2323@gmail.com',
+                  password     = '1QAZ@wsx')
+        print "\n send mail done!\n"
+
+#//------------------------------
+#//          main
+#//------------------------------
+#// 1. show program start
+print "===================================================="
+print '\n##### Welcome to Make Money Machine World ##### \n'
+print "===================================================="
+#//share of stock
+PIECE = 0
+
+#//MUST DO! : your stock number
+STOCK_1 = '6505'
+STOCK_2 = '2880'
+#//MUST DO! : create record trade price file
+init_record_trade_price_file(STOCK_1)
+init_record_trade_price_file(STOCK_2)
+
+#// 7. timer, ruting to run this
+print "start ticking..."
+forever = 10
+
+tStart = time.time()
+
+if(DEBUG == TURN_ON):
+    #//use for simulate the day
+    sim_day = -8
+    forever = 2
+    while (forever > 0):
+        tEnd = time.time()
+        #1day=(24*(60*60))
+        if((tEnd-tStart) >= (5)):
+            print "time up..."
+            today = datetime.date.today()
+            today = str(today)
+            print 'today is : ' + today
+            main_process(STOCK_1)
+            print "---------------"
+            main_process(STOCK_2)
+            print "---------------"
+            print "now, share of " + STOCK_1 + ":" + str(PIECE)
+            print "now, share of " + STOCK_2 + ":" + str(PIECE)
+            tStart = time.time() #//restart timer
+            print "start ticking..."
+            sim_day = -7
+            print "===================================================="
+            forever = (forever - 1 )
+
+else:
+    print "time up..."
+    today = datetime.date.today()
+    today = str(today)
+    print 'today is : ' + today
+    print "---------------"
+    main_process(STOCK_1)
+    print "---------------"
+    main_process(STOCK_2)
+    print "now, share of " + STOCK_1 + ":" + str(PIECE)
+    print "now, share of " + STOCK_2 + ":" + str(PIECE)
+    print "start ticking..."
+    print "===================================================="
+print "end~"
+
