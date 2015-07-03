@@ -60,16 +60,6 @@
 #         (9) csv file depand on different folder to save
 #         (10) two Stock should send one mail...
 #
-
-#
-#Next action:
-#         ok - line 412 (1) merge mail "keep or sale" & "trade price" into one mail
-#         (3) read a external file.txt which your stock list as "STOCK=" input
-#         (6) manual input share of stock and write into record share file
-#         (7) saturday and sunday don't need work. filter sat and sunday.
-#         ok - (8) record CPU temp into mail and file(CPU_temp.txt)
-#         (9) csv file depand on different folder to save
-#         (10) two Stock should send one mail...
 #
 
 #//-----------------------------
