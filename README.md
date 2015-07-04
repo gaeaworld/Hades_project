@@ -1,6 +1,6 @@
 # Hades_project
 
-###modify date:20150703,22:50
+###modify date:20150704,10:21
 #
 ###install grs and example and step:
 	sudo apt-get install python-dev
@@ -45,11 +45,9 @@
 				2. chose the main.py 
 				3. the script "fw_Hades_update.sh" will take care of replace main.py file 
 			(3) merge mail "keep or sale" & "trade price" into one mail
-#
+            (4) record CPU temp into mail and file(CPU_temp.txt)
 ###Next action:
-			(3) read a external file.txt which your stock list as "STOCK=" input
-			(6) manual input share of stock and write into record share file
-			ok - (8) record CPU temp into mail and file(CPU_temp.txt)
-			(9) csv file depand on different folder to save
-			 (10) two Stock should send one mail...
-#
+			*-* read a external file.txt which your stock list as "STOCK=" input
+			*-* manual input share of stock and write into record share file 
+			*-* csv file depand on different folder to save
+			*-* two Stock should send one mail...
