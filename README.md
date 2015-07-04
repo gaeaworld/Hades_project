@@ -45,9 +45,11 @@
 				2. chose the main.py 
 				3. the script "fw_Hades_update.sh" will take care of replace main.py file 
 			(3) merge mail "keep or sale" & "trade price" into one mail
-            (4) record CPU temp into mail and file(CPU_temp.txt)
+			(4) record CPU temp into mail and file(CPU_temp.txt)
+###20150704 - version 0.04
+			(1) two Stock should send one mail
+
 ###Next action:
 			*-* read a external file.txt which your stock list as "STOCK=" input
 			*-* manual input share of stock and write into record share file 
 			*-* csv file depand on different folder to save
-			*-* two Stock should send one mail...

@@ -26,6 +26,11 @@ DEBUG = TURN_OFF
 DEBUG_MAIL = TURN_ON
 
 #//-----------------------------
+#//          Variable
+#//-----------------------------
+Project_Path = "/home/pi/Hades_project/"
+
+#//-----------------------------
 #//          function
 #// http://www.qttc.net/201209207.html
 #//-----------------------------
@@ -214,6 +219,56 @@ def detect_file(file_name):
     else:
         return 0
 
+#//---------------------------------
+#// write mail file - mail_msg.txt
+#//---------------------------------
+def write_mail_msg(msg):
+    filename = Project_Path + "mail_msg.txt"
+    #10.1 open "mail_msg.txt"
+    fd = open(filename, 'a')    
+    #10.2 write msg into file
+    fd.write(msg)
+    #10.3 close file
+    fd.close()
+
+#//---------------------------------
+#// read mail file - mail_msg.txt
+#//---------------------------------
+def read_mail_msg():
+    filename = Project_Path + "mail_msg.txt"
+    #11.1 open "mail_msg.txt"
+    fd = open(filename, 'r')  
+    #11.2 write msg into file
+    res = fd.read()
+    #11.3 close file
+    fd.close()
+    #11.4 return msg content
+    return res
+
+#//---------------------------------
+#// clear mail file - mail_msg.txt
+#//---------------------------------
+def clear_mail_msg():
+    filename = Project_Path + "mail_msg.txt"
+    clear_msg = ''
+    #13.1 open "mail_msg.txt"
+    fd = open(filename, 'w')    
+    #13.2 write msg into file
+    fd.write(clear_msg)
+    #13.3 close file
+    fd.close()
+
+#//---------------------------------
+#// SEND MAIL function
+#//---------------------------------
+def SEND_MAIL_msg(MSG):
+        sendemail(from_addr    = 'python@RC.net',
+                  to_addr_list = ['tef2323@gmail.com'],
+                  cc_addr_list = [''],
+                  subject      = 'Make money machine letter',
+                  message      = MSG,
+                  login        = 'tef2323@gmail.com',
+                  password     = '1QAZ@wsx')
 
 #//---------------------------------
 #// main_process
@@ -443,7 +498,7 @@ def main_process(stock_number):
     if(keep_flag == 0):
         result_massage = today_date + " machine say:" + stock_number + " SALE OUT!!\n" + cpu_tempertrue_value
     else:
-        result_massage = today_date + " machine say:" + stock_number + " KEEP!! " + cpu_tempertrue_value
+        result_massage = today_date + " machine say:" + stock_number + " KEEP!!\n" + cpu_tempertrue_value
 
     #// 6. send mail to notice user
     #// issue: cc wouldn't work!
@@ -464,14 +519,10 @@ def main_process(stock_number):
         trade_result_massage = tr_file.read()
         result_massage = deal_result_massage + '\n' +  trade_result_massage
         tr_file.close()
-        sendemail(from_addr    = 'python@RC.net',
-                  to_addr_list = ['tef2323@gmail.com'],
-                  cc_addr_list = [''],
-                  subject      = 'Make money machine letter',
-                  message      = result_massage,
-                  login        = 'tef2323@gmail.com',
-                  password     = '1QAZ@wsx')
-        print "\n send mail done!\n"
+
+        write_mail_msg(result_massage)
+        between_line = "\n--------------------------------------------------------\n"
+        write_mail_msg(between_line)
 
 #//------------------------------
 #//          main
@@ -495,11 +546,10 @@ print "start ticking..."
 forever = 10
 
 tStart = time.time()
-
 if(DEBUG == TURN_ON):
     #//use for simulate the day
     sim_day = -8
-    forever = 2
+    forever = 1
     while (forever > 0):
         tEnd = time.time()
         #1day=(24*(60*60))
@@ -508,10 +558,18 @@ if(DEBUG == TURN_ON):
             today = datetime.date.today()
             today = str(today)
             print 'today is : ' + today
+            clear_mail_msg()
             main_process(STOCK_1)
             print "---------------"
             main_process(STOCK_2)
             print "---------------"
+
+            MAIL_MSG = read_mail_msg()
+            print MAIL_MSG
+            SEND_MAIL_msg(MAIL_MSG)
+
+            print "\n send mail done!\n"
+
             print "now, share of " + STOCK_1 + ":" + str(PIECE)
             print "now, share of " + STOCK_2 + ":" + str(PIECE)
             tStart = time.time() #//restart timer
@@ -525,10 +583,19 @@ else:
     today = datetime.date.today()
     today = str(today)
     print 'today is : ' + today
+    clear_mail_msg()
     print "---------------"
     main_process(STOCK_1)
     print "---------------"
     main_process(STOCK_2)
+    print "---------------"
+
+    MAIL_MSG = read_mail_msg()
+    print MAIL_MSG
+    SEND_MAIL_msg(MAIL_MSG)
+
+    print "\n send mail done!\n"
+
     print "now, share of " + STOCK_1 + ":" + str(PIECE)
     print "now, share of " + STOCK_2 + ":" + str(PIECE)
     print "start ticking..."
