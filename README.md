@@ -48,7 +48,7 @@
 			(4) record CPU temp into mail and file(CPU_temp.txt)
 ###20150704 - version 0.04
 			(1) two Stock should send one mail
-                        (2) show version in fw website
+			(2) show version in fw website
 
 ###Next action:
 			*-* read a external file.txt which your stock list as "STOCK=" input
