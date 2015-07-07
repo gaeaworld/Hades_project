@@ -21,6 +21,7 @@ while [ 1 ]; do
         #file not exist
         #echo "file not exists."
         #continue
+        echo ""
     fi
     if [ -f "/home/pi/Hades_project/upload/index.html" ]; then
         #file exist
@@ -33,5 +34,6 @@ while [ 1 ]; do
         #file not exist
         #echo "file not exists."
         #continue
+        echo ""
     fi
 done

@@ -496,9 +496,9 @@ def main_process(stock_number):
     today_date = datetime.date.today()
     today_date = str(today_date)
     if(keep_flag == 0):
-        result_massage = today_date + " machine say:" + stock_number + " SALE OUT!!\n" + cpu_tempertrue_value
+        result_massage = today_date+" \nmachine say:  "+stock_number+" SALE OUT!!\n"+"today final price: "+day1_e+"\n"+cpu_tempertrue_value
     else:
-        result_massage = today_date + " machine say:" + stock_number + " KEEP!!\n" + cpu_tempertrue_value
+        result_massage = today_date+" \nmachine say:  "+stock_number+" KEEP!!\n"+"today final price: "+day1_e+"\n"+cpu_tempertrue_value
 
     #// 6. send mail to notice user
     #// issue: cc wouldn't work!
@@ -536,7 +536,7 @@ PIECE = 0
 
 #//MUST DO! : your stock number
 STOCK_1 = '6505'
-STOCK_2 = '2880'
+STOCK_2 = '2823'
 #//MUST DO! : create record trade price file
 init_record_trade_price_file(STOCK_1)
 init_record_trade_price_file(STOCK_2)
@@ -565,7 +565,7 @@ if(DEBUG == TURN_ON):
             print "---------------"
 
             MAIL_MSG = read_mail_msg()
-            print MAIL_MSG
+            #print MAIL_MSG
             SEND_MAIL_msg(MAIL_MSG)
 
             print "\n send mail done!\n"

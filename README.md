@@ -1,6 +1,6 @@
 # Hades_project
 
-###modify date:20150704,10:21
+###modify date:20150707,23:00
 #
 ###install grs and example and step:
 	sudo apt-get install python-dev
@@ -49,6 +49,13 @@
 ###20150704 - version 0.04
 			(1) two Stock should send one mail
 			(2) show version in fw website
+
+###20150707 - version 0.04
+                        (1) change loop to 18:00 for insure Hades can get correct csv file.
+                            1. crontab -e
+                            2. 00 18 * * 1-5 /home/pi/Hades_project/start_service.sh
+                        (2) fix can't auto update main.py fw from website.
+                            modify "fw_Hades_update.sh" line 24 and line 37to echo something
 
 ###Next action:
 			*-* read a external file.txt which your stock list as "STOCK=" input
