@@ -447,13 +447,16 @@ def main_process(stock_number):
         return 1
     #print "---------------"
     #// 5. algorithm to compare value bigger or lower
-    #// 5.1 three day detection algorithm, buy in
-    #//     buy_flag = 0 -> not buy, 1 -> buy
-    print "+++++ BUY Session ++++"
-    if(day1_h > day3_h):
-        print (sdate1+" is high than "+sdate3+", BUY!")
-        buy_flag = 1
-        if(PIECE == '0'):
+
+    #// 5.3 if you have share of stock, if you have 1 PIECE go to sale session,
+    #//     otherwise go to buy session
+    if(PIECE == '0'): #// share of stock is none
+        #// 5.1 three day detection algorithm, buy in
+        #// 5.4 stage = 1 -> buy, 2 -> do not buy
+        print "+++++ BUY Session ++++"
+        if(day1_h > day3_h):
+            print (sdate1+" is high than "+sdate3+", BUY!")
+            stage = 1
             print "buy in share of 1000"
             PIECE = 1000
             fd = open(filepath, 'w')
@@ -462,18 +465,15 @@ def main_process(stock_number):
             fd.close
             record_trade_price(stock_number, day1_h, 'buy')
         else:
-            print "do nothing"
-    else:
-        print (sdate1+" is high than "+sdate3+", DO NOT BUY!")
-        buy_flag = 0
-
-    #// 5.2 three day detection algorithm, sale out
-    #//    keep_flag = 0 ->sale out, 1 -> keep
-    print "+++++ SALE Session ++++"
-    if(day1_e < day3_e):
-        print (sdate1+" is lower than "+sdate3+", SALE OUT!")
-        keep_flag = 0
-        if(PIECE == '1000'):
+            print (sdate1+" is high than "+sdate3+", DO NOT BUY!")
+            stage = 2
+    elif(PIECE == '1000'): #// share of stock is 1
+        #// 5.2 three day detection algorithm, sale out
+        #// 5.4 stage = 3 ->sale out, 4 -> keep
+        print "+++++ SALE Session ++++"
+        if(day1_e < day3_e):
+            print (sdate1+" is lower than "+sdate3+", SALE OUT!")
+            stage = 3
             print "sale out share of 1000"
             PIECE = 0
             fd = open(filepath, 'w')
@@ -482,10 +482,10 @@ def main_process(stock_number):
             fd.close
             record_trade_price(stock_number, day1_e, 'sale')
         else:
-            print "you don't have any share of stock"
+            print sdate1+" is higher or equal than "+sdate3+", KEEP!"
+            stage = 4
     else:
-        print sdate1+" is higher or equal than "+sdate3+", KEEP!"
-        keep_flag = 1
+        print "something wrong about share of stock..."
 
     #// 9. CPU record
     cpu_tempertrue_value = get_cpu_temp()
@@ -495,10 +495,17 @@ def main_process(stock_number):
 
     today_date = datetime.date.today()
     today_date = str(today_date)
-    if(keep_flag == 0):
-        result_massage = today_date+" \nmachine say:  "+stock_number+" SALE OUT!!\n"+"today final price: "+day1_e+"\n"+cpu_tempertrue_value
+    #// 5.5 use a switch to give different msg to "result_message" for mail
+    if(stage == 1):
+        result_message = today_date+"  "+stock_number+" \nmachine say:  "+" BUY!!\n"+"today final price: "+day1_e+"\n"+cpu_tempertrue_value
+    elif(stage == 2):
+        result_message = today_date+"  "+stock_number+" \nmachine say:  "+" DO NOT BUY!!\n"+"today final price: "+day1_e+"\n"+cpu_tempertrue_value
+    elif(stage == 3):
+        result_message = today_date+"  "+stock_number+" \nmachine say:  "+" SALE OUT!!\n"+"today final price: "+day1_e+"\n"+cpu_tempertrue_value
+    elif(stage == 4):
+        result_message = today_date+"  "+stock_number+" \nmachine say:  "+" KEEP!!\n"+"today final price: "+day1_e+"\n"+cpu_tempertrue_value
     else:
-        result_massage = today_date+" \nmachine say:  "+stock_number+" KEEP!!\n"+"today final price: "+day1_e+"\n"+cpu_tempertrue_value
+        print "stage going wrong..."
 
     #// 6. send mail to notice user
     #// issue: cc wouldn't work!
@@ -509,18 +516,18 @@ def main_process(stock_number):
         #          to_addr_list = ['tef2323@gmail.com'],
         #          cc_addr_list = [''],
         #          subject      = 'Make money machine letter',
-        #          message      = result_massage,
+        #          message      = result_message,
         #          login        = 'tef2323@gmail.com',
         #          password     = '1QAZ@wsx')
-        deal_result_massage = result_massage
+        deal_result_message = result_message
         #//read trade record file
         file_name = '/home/pi/Hades_project/trade_record/' + stock_number + '_tr_price.txt'
         tr_file = open(file_name, 'r')
-        trade_result_massage = tr_file.read()
-        result_massage = deal_result_massage + '\n' +  trade_result_massage
+        trade_result_message = tr_file.read()
+        result_message = deal_result_message + '\n' +  trade_result_message
         tr_file.close()
 
-        write_mail_msg(result_massage)
+        write_mail_msg(result_message)
         between_line = "\n--------------------------------------------------------\n"
         write_mail_msg(between_line)
 
@@ -591,7 +598,7 @@ else:
     print "---------------"
 
     MAIL_MSG = read_mail_msg()
-    print MAIL_MSG
+    #//print MAIL_MSG
     SEND_MAIL_msg(MAIL_MSG)
 
     print "\n send mail done!\n"

@@ -57,6 +57,12 @@
                         (2) fix can't auto update main.py fw from website.
                             modify "fw_Hades_update.sh" line 24 and line 37to echo something
 
+###20150714 - version 0.04
+                        (1) add new logic about buy and sale session
+                            #//5.3 if you have share of stock
+                            #//5.4 stage = 1:buy, 2:do not buy, 3:sale out, 4. keep
+                            #//5.5 use a switch to give different msg to "result_message" for mail
+
 ###Next action:
 			*-* read a external file.txt which your stock list as "STOCK=" input
 			*-* manual input share of stock and write into record share file 
