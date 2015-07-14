@@ -67,3 +67,6 @@
 			*-* read a external file.txt which your stock list as "STOCK=" input
 			*-* manual input share of stock and write into record share file 
 			*-* csv file depand on different folder to save
+            *-* important!! change email account and password read rule.
+                change to read local file "mail_account.txt" and "mail_password.txt"
+                to fill out the python mail function.
