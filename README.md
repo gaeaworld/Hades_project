@@ -70,3 +70,6 @@
             *-* important!! change email account and password read rule.
                 change to read local file "mail_account.txt" and "mail_password.txt"
                 to fill out the python mail function.
+                1.use gen_email_info.sh to gen "email_account.txt" and "email_password.txt
+                2.Hades to read those two file and save to a variable
+                3.put those two variable into send mail function

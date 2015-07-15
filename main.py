@@ -259,16 +259,37 @@ def clear_mail_msg():
     fd.close()
 
 #//---------------------------------
+#// 11.2 read account and password file
+#// email_account.txt, email_password.txt
+#//---------------------------------
+def read_AP_file(file_choice):
+
+    if(file_choice == 1):
+        filename = Project_Path + "email_account.txt"
+    elif(file_choice == 2):
+        filename = Project_Path + "email_password.txt"
+    else:
+        print "file_choice error..."
+
+    fd = open(filename, 'r')  
+    res = fd.read()
+    fd.close()
+    return res
+
+#//---------------------------------
 #// SEND MAIL function
 #//---------------------------------
 def SEND_MAIL_msg(MSG):
+        #11.1 read email account and password from email_account.txt and email_password.txt
+        MAIL_ACCOUNT = read_AP_file(1)
+        MAIL_PASSWORD = read_AP_file(2)
         sendemail(from_addr    = 'python@RC.net',
                   to_addr_list = ['tef2323@gmail.com'],
                   cc_addr_list = [''],
                   subject      = 'Make money machine letter',
                   message      = MSG,
-                  login        = 'tef2323@gmail.com',
-                  password     = '1QAZ@wsx')
+                  login        = MAIL_ACCOUNT,
+                  password     = MAIL_PASSWORD)
 
 #//---------------------------------
 #// main_process
