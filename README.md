@@ -86,6 +86,7 @@
                 3.input how much share of stock below stock number like
                   6505
                   1000
+            *-* buy price should be next day begin price and sel price should, too.
 			*-* read STOCK_list.txt about share of stock and write into record share file 
 			*-* csv file depand on different folder to save
 
