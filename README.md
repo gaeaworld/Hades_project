@@ -1,6 +1,13 @@
 # Hades_project
 
-###modify date:20150707,23:00
+###modify date:20150719,21:18
+
+### Start Hades stop:
+    (1) run gen_email_info.sh to config personal email info for Hades.
+    (2) run command "crontab -e" and input string as following
+        00 18 * * 1-5 /home/pi/Hades_project/start_service.sh
+        example mean run Hades ervery 18:00 day from mon to fri.
+
 #
 ###install grs and example and step:
 	sudo apt-get install python-dev
@@ -63,13 +70,22 @@
                 #//5.4 stage = 1:buy, 2:do not buy, 3:sale out, 4. keep
                 #//5.5 use a switch to give different msg to "result_message" for mail
 
-###Next action:
-			*-* read a external file.txt which your stock list as "STOCK=" input
-			*-* manual input share of stock and write into record share file 
-			*-* csv file depand on different folder to save
-            *-* important!! change email account and password read rule.
+###20150715 - version 0.04
+            (1) important!! change email account and password read rule.
                 change to read local file "mail_account.txt" and "mail_password.txt"
                 to fill out the python mail function.
                 1.use gen_email_info.sh to gen "email_account.txt" and "email_password.txt
                 2.Hades to read those two file and save to a variable
                 3.put those two variable into send mail function
+
+
+###Next action:
+			*-* read a external file.txt which your stock list as "STOCK=" input
+                1.read STOCK_list.txt to get user want monitor STOCK number.
+                2.put each one stock into variable "STOCK"
+                3.input how much share of stock below stock number like
+                  6505
+                  1000
+			*-* read STOCK_list.txt about share of stock and write into record share file 
+			*-* csv file depand on different folder to save
+
