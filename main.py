@@ -570,7 +570,7 @@ STOCK_4 = '1444'
 STOCK_5 = '3576'
 STOCK_6 = '4915'
 STOCK_7 = '3682'
-STOCK_7 = '2887'
+STOCK_8 = '2887'
 #//MUST DO! : create record trade price file
 init_record_trade_price_file(STOCK_1)
 init_record_trade_price_file(STOCK_2)
