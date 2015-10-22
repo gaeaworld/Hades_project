@@ -225,7 +225,7 @@ def detect_file(file_name):
 def write_mail_msg(msg):
     filename = Project_Path + "mail_msg.txt"
     #10.1 open "mail_msg.txt"
-    fd = open(filename, 'a')    
+    fd = open(filename, 'a')
     #10.2 write msg into file
     fd.write(msg)
     #10.3 close file
@@ -237,7 +237,7 @@ def write_mail_msg(msg):
 def read_mail_msg():
     filename = Project_Path + "mail_msg.txt"
     #11.1 open "mail_msg.txt"
-    fd = open(filename, 'r')  
+    fd = open(filename, 'r')
     #11.2 write msg into file
     res = fd.read()
     #11.3 close file
@@ -252,7 +252,7 @@ def clear_mail_msg():
     filename = Project_Path + "mail_msg.txt"
     clear_msg = ''
     #13.1 open "mail_msg.txt"
-    fd = open(filename, 'w')    
+    fd = open(filename, 'w')
     #13.2 write msg into file
     fd.write(clear_msg)
     #13.3 close file
@@ -271,7 +271,7 @@ def read_AP_file(file_choice):
     else:
         print "file_choice error..."
 
-    fd = open(filename, 'r')  
+    fd = open(filename, 'r')
     res = fd.read()
     fd.close()
     return res
@@ -565,6 +565,12 @@ PIECE = 0
 #//MUST DO! : your stock number
 STOCK_1 = '6505'
 STOCK_2 = '2823'
+STOCK_3 = '2345'
+STOCK_4 = '1444'
+STOCK_5 = '3576'
+STOCK_6 = '4915'
+STOCK_7 = '3682'
+STOCK_7 = '2887'
 #//MUST DO! : create record trade price file
 init_record_trade_price_file(STOCK_1)
 init_record_trade_price_file(STOCK_2)
@@ -617,6 +623,19 @@ else:
     print "---------------"
     main_process(STOCK_2)
     print "---------------"
+    main_process(STOCK_3)
+    print "---------------"
+    main_process(STOCK_4)
+    print "---------------"
+    main_process(STOCK_5)
+    print "---------------"
+    main_process(STOCK_6)
+    print "---------------"
+    main_process(STOCK_7)
+    print "---------------"
+    main_process(STOCK_8)
+    print "---------------"
+
 
     MAIL_MSG = read_mail_msg()
     #//print MAIL_MSG

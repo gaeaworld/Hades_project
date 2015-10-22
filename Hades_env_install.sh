@@ -7,7 +7,7 @@ fw_file="$env_folder/fw_Hades_update.sh"
 www_folder="/home/pi/Hades_project/www"
 
 echo "----------install python lib--------------"
-sudp apt-get install python-pip
+sudo apt-get install python-pip
 sudo pip install grs
 echo "ok"
 echo "----------------------------------------"
@@ -64,6 +64,6 @@ echo "----------------------------------------"
 echo "------update php fw web site file-------"
 echo "continue..."
 echo "---create www folder---"
-sudo cp $www_folder/* /var/www 
+sudo cp $www_folder/* /var/www
 #echo "ok"
 echo "----------------------------------------"
