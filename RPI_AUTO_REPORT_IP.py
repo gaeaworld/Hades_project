@@ -51,8 +51,8 @@ sendemail(from_addr    = 'python@RC.net',
           cc_addr_list = [''],
           subject      = 'I am raspberry, Confessions RPI self IP address',
           message      = ip_data,
-          login        = 'tef2323@gmail.com',
-          password     = '1QAZ@wsx')
+          login        = 'your mail',
+          password     = 'your mail password')
 
 print "\nsend mail done!\n"
 
