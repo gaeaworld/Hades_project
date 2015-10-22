@@ -321,7 +321,7 @@ def main_process(stock_number):
     #// 3.1 create share of stock folder
     mkpath="/home/pi/Hades_project/share_stock"
     mkdir(mkpath)
-    #// 3.2 recore share of stock file
+    #// 3.2 record share of stock file
     filepath = '/home/pi/Hades_project/share_stock/' + stock_number + '.txt'
     isExists = os.path.exists(filepath)
 
@@ -563,14 +563,16 @@ print "===================================================="
 PIECE = 0
 
 #//MUST DO! : your stock number
-STOCK_1 = '6505'
-STOCK_2 = '2823'
-STOCK_3 = '2345'
-STOCK_4 = '1444'
-STOCK_5 = '3576'
-STOCK_6 = '4915'
-STOCK_7 = '3682'
-STOCK_8 = '2887'
+STOCK_1 =  '6505'
+STOCK_2 =  '2823'
+STOCK_3 =  '2345'
+STOCK_4 =  '1444'
+STOCK_5 =  '3576'
+STOCK_6 =  '4915'
+STOCK_7 =  '3682'
+STOCK_8 =  '2887'
+STOCK_9 =  '3016'
+STOCK_10 = '2911'
 #//MUST DO! : create record trade price file
 init_record_trade_price_file(STOCK_1)
 init_record_trade_price_file(STOCK_2)
@@ -634,6 +636,10 @@ else:
     main_process(STOCK_7)
     print "---------------"
     main_process(STOCK_8)
+    print "---------------"
+    main_process(STOCK_9)
+    print "---------------"
+    main_process(STOCK_10)
     print "---------------"
 
 

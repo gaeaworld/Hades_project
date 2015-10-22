@@ -49,8 +49,8 @@
 				4. /etc/init.d/cron restart
 			(2) apach2 server as fw update interface
 				1. input 192.168.1.116 into browser
-				2. chose the main.py 
-				3. the script "fw_Hades_update.sh" will take care of replace main.py file 
+				2. chose the main.py
+				3. the script "fw_Hades_update.sh" will take care of replace main.py file
 			(3) merge mail "keep or sale" & "trade price" into one mail
 			(4) record CPU temp into mail and file(CPU_temp.txt)
 ###20150704 - version 0.04
@@ -87,6 +87,8 @@
                   6505
                   1000
             *-* buy price should be next day begin price and sel price should, too.
-			*-* read STOCK_list.txt about share of stock and write into record share file 
+			*-* read STOCK_list.txt about share of stock and write into record share file
 			*-* csv file depand on different folder to save
+			*-* calculate the grow slope.
+			*-* auto read STOCK number instead input manual.
 
