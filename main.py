@@ -330,10 +330,9 @@ def main_process(stock_number):
         piece_num = '0'
         fd.write(piece_num)
         fd.close
-        PIECE = 0
+        PIECE = '0'
         print filepath+' create ok!!'
-    else:
-        #print filepath+' folder already exist!!'
+    else:        #print filepath+' folder already exist!!'
         fd = open(filepath, 'r')
         PIECE = fd.read()
         fd.close
@@ -385,7 +384,7 @@ def main_process(stock_number):
             check_done = 1
             #print "---------------"
         else:
-                    #print "can't find match day2!"
+            #print "can't find match day2!"
             delta_day = (delta_day - 1)
 
 
@@ -576,6 +575,14 @@ STOCK_10 = '2911'
 #//MUST DO! : create record trade price file
 init_record_trade_price_file(STOCK_1)
 init_record_trade_price_file(STOCK_2)
+init_record_trade_price_file(STOCK_3)
+init_record_trade_price_file(STOCK_4)
+init_record_trade_price_file(STOCK_5)
+init_record_trade_price_file(STOCK_6)
+init_record_trade_price_file(STOCK_7)
+init_record_trade_price_file(STOCK_8)
+init_record_trade_price_file(STOCK_9)
+init_record_trade_price_file(STOCK_10)
 
 #// 7. timer, ruting to run this
 print "start ticking..."
