@@ -656,8 +656,8 @@ else:
 
     print "\n send mail done!\n"
 
-    print "now, share of " + STOCK_1 + ":" + str(PIECE)
-    print "now, share of " + STOCK_2 + ":" + str(PIECE)
+    #print "now, share of " + STOCK_1 + ":" + str(PIECE)
+    #print "now, share of " + STOCK_2 + ":" + str(PIECE)
     print "start ticking..."
     print "===================================================="
 print "end~"
