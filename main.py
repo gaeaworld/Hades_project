@@ -24,6 +24,7 @@ TURN_ON = 1
 TURN_OFF = 0
 DEBUG = TURN_OFF
 DEBUG_MAIL = TURN_ON
+DEBUG_AUTO_READ_FILE = 0
 
 #//-----------------------------
 #//          Variable
@@ -549,7 +550,7 @@ def main_process(stock_number):
 
         write_mail_msg(result_message)
         between_line = "\n--------------------------------------------------------\n"
-        write_mail_msg(between_line)
+        write_mail_msg(between_line) 
 
 #//------------------------------
 #//          main
@@ -620,7 +621,29 @@ if(DEBUG == TURN_ON):
             sim_day = -7
             print "===================================================="
             forever = (forever - 1 )
+else if(DEBUG_AUTO_READ_FILE == TURN_ON):
+    #------------------------------
+    #1.detect file exist or not
+    filepath = '/home/pi/Hades_project/stock_list.txt'
+    isExists = os.path.exists(filepath)
 
+    if not isExists:
+        print filepath+' error, Hades can not find son!!'
+    else:     
+        #------------------------------
+        #2.auto read file, stock_list.txt
+        #3.if read in the button of file and break
+        fd = open(filepath, 'r')
+        while True:
+            stock_number = fd.readline()
+            if not line: break
+            print 'stock_number: ' + stock_number
+        fd.close()
+
+        #------------------------------
+        #4.get stock number. put into init() and main_process()
+        init_record_trade_price_file(stock_number)
+        main_process(stock_number)
 else:
     print "time up..."
     today = datetime.date.today()
