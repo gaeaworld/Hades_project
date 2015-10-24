@@ -91,4 +91,7 @@
 			*-* csv file depand on different folder to save
 			*-* calculate the grow slope.
 			*-* auto read STOCK number instead input manual.
-
+				- code logic
+				1.detect file exist or not
+				2.auto read file, stock_list.txt
+				3.get stock number and put into main_process()
