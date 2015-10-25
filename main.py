@@ -10,7 +10,7 @@
 import sys
 import csv
 import datetime
-from time import gmtime, strftime, strptime
+from time import gmtime, strftime, strptime, sleep
 import smtplib
 import time
 #// 2. catch a stock value, like get 3231 value
@@ -562,28 +562,29 @@ print "===================================================="
 #//share of stock
 PIECE = 0
 
-#//MUST DO! : your stock number
-STOCK_1 =  '6505'
-STOCK_2 =  '2823'
-STOCK_3 =  '2345'
-STOCK_4 =  '1444'
-STOCK_5 =  '3576'
-STOCK_6 =  '4915'
-STOCK_7 =  '3682'
-STOCK_8 =  '2887'
-STOCK_9 =  '3016'
-STOCK_10 = '2911'
-#//MUST DO! : create record trade price file
-init_record_trade_price_file(STOCK_1)
-init_record_trade_price_file(STOCK_2)
-init_record_trade_price_file(STOCK_3)
-init_record_trade_price_file(STOCK_4)
-init_record_trade_price_file(STOCK_5)
-init_record_trade_price_file(STOCK_6)
-init_record_trade_price_file(STOCK_7)
-init_record_trade_price_file(STOCK_8)
-init_record_trade_price_file(STOCK_9)
-init_record_trade_price_file(STOCK_10)
+if(DEBUG_AUTO_READ_FILE == TURN_OFF):
+    #//MUST DO! : your stock number
+    STOCK_1 =  '6505'
+    STOCK_2 =  '2823'
+    STOCK_3 =  '2345'
+    STOCK_4 =  '1444'
+    STOCK_5 =  '3576'
+    STOCK_6 =  '4915'
+    STOCK_7 =  '3682'
+    STOCK_8 =  '2887'
+    STOCK_9 =  '3016'
+    STOCK_10 = '2911'
+    #//MUST DO! : create record trade price file
+    init_record_trade_price_file(STOCK_1)
+    init_record_trade_price_file(STOCK_2)
+    init_record_trade_price_file(STOCK_3)
+    init_record_trade_price_file(STOCK_4)
+    init_record_trade_price_file(STOCK_5)
+    init_record_trade_price_file(STOCK_6)
+    init_record_trade_price_file(STOCK_7)
+    init_record_trade_price_file(STOCK_8)
+    init_record_trade_price_file(STOCK_9)
+    init_record_trade_price_file(STOCK_10)
 
 #// 7. timer, ruting to run this
 print "start ticking..."
@@ -639,12 +640,18 @@ elif(DEBUG_AUTO_READ_FILE == TURN_ON):
             stock_number = fd.readline()
             if not stock_number: break
             print 'stock_number: ' + stock_number
+            #stock_number = os.popen(stock_number).read().strip('\n')
+            stock_number = str(stock_number)
+            stock_number = stock_number.strip()
+            init_record_trade_price_file(stock_number)
+            main_process(stock_number)
+            #sleep(0.05)
         fd.close()
 
         #------------------------------
         #4.get stock number. put into init() and main_process()
-        init_record_trade_price_file(stock_number)
-        main_process(stock_number)
+        #init_record_trade_price_file(stock_number)
+        #main_process(stock_number)
 else:
     print "time up..."
     today = datetime.date.today()
