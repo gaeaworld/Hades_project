@@ -621,10 +621,11 @@ if(DEBUG == TURN_ON):
             sim_day = -7
             print "===================================================="
             forever = (forever - 1 )
-else if(DEBUG_AUTO_READ_FILE == TURN_ON):
+elif(DEBUG_AUTO_READ_FILE == TURN_ON):
     #------------------------------
     #1.detect file exist or not
-    filepath = '/home/pi/Hades_project/stock_list.txt'
+    #filepath = '/home/pi/Hades_project/stock_list.txt'
+    filepath = '/home/james/my_file/Hades_Project/Hades_project/stock_list.txt'
     isExists = os.path.exists(filepath)
 
     if not isExists:
@@ -636,7 +637,7 @@ else if(DEBUG_AUTO_READ_FILE == TURN_ON):
         fd = open(filepath, 'r')
         while True:
             stock_number = fd.readline()
-            if not line: break
+            if not stock_number: break
             print 'stock_number: ' + stock_number
         fd.close()
 
