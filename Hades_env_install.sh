@@ -7,6 +7,7 @@ fw_file="$env_folder/fw_Hades_update.sh"
 www_folder="/home/pi/Hades_project/www"
 
 echo "----------install python lib--------------"
+sudo apt-get install python-dev
 sudo apt-get install python-pip
 sudo pip install grs
 echo "ok"
