@@ -2,35 +2,6 @@
 	<head>
 	<title>FW Update</title>
 	<link href="layout.css" rel="stylesheet" type="text/css" />
-	<link rel="stylesheet" href="./jquery-ui-1.11.4/jquery-ui.css" type="text/css">
-	<script src="./jquery-1.12.0.js"></script>
-	<script src="./jquery-ui-1.11.4/jquery-ui.js"></script>
-
-	 <script>
-		$(function() {
-		$( "button:first" ).button({
-			icons: {
-				primary: "ui-icon-locked"
-			},
-			text: false
-			}).next().button({
-			icons: {
-				primary: "ui-icon-locked"
-			}
-			}).next().button({
-			icons: {
-				primary: "ui-icon-gear",
-				secondary: "ui-icon-triangle-1-s"
-			}
-			}).next().button({
-			icons: {
-				primary: "ui-icon-gear",
-				secondary: "ui-icon-triangle-1-s"
-			},
-			text: false
-			});
-		});
-	</script>
 	</head>
 	<body>
 		<h2 align="center">Hades FW Update-v0.04</h2>
@@ -41,10 +12,6 @@
 			<input type="hidden" name="max_file_size" value="1024000">
 			<input type="file" name="myfile">
 			<input type="submit" value="upload">
-			<button>Button with icon only</button>
-			<button>Button with icon on the left</button>
-			<button>Button with two icons</button>
-			<button>Button with two icons and no text</button>
 			</form>
 		</div>
 	</body>
